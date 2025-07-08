@@ -50,8 +50,9 @@ video_transcriber/LearningArticles/*.md
 !video_transcriber/InputVideos/.gitkeep
 !video_transcriber/OutputMarkdown/.gitkeep
 !video_transcriber/LearningArticles/.gitkeep
-!video_transcriber/InputVideos/Processed/.gitkeep
 
 # Environment variables
 .env
-video_transcriber/InputVideos/Processed/IT_Factor_1.2_Building_Charisma.mp4
+
+# Test scripts (may contain temporary API keys during development)
+video_transcriber/test_*.py
