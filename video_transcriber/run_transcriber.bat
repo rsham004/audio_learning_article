@@ -1,7 +1,32 @@
 @echo off
-REM Set the AssemblyAI API key as an environment variable
-REM Replace YOUR_ASSEMBLYAI_API_KEY with your actual API key
-set ASSEMBLYAI_API_KEY=579bb999c2234de0921a01ce336d71da
+echo Audio Learning Article - Enhanced Video Transcriber
+echo ===================================================
+echo Features: Video transcription + AI learning article generation
+echo.
+
+REM Check if API keys are set as environment variables
+if "%ASSEMBLYAI_API_KEY%"=="" (
+    echo ERROR: ASSEMBLYAI_API_KEY environment variable is not set.
+    echo Please set your AssemblyAI API key as an environment variable:
+    echo   set ASSEMBLYAI_API_KEY=your_assemblyai_api_key_here
+    echo.
+    echo Or add it to your system environment variables.
+    pause
+    exit /b 1
+)
+
+if "%GEMINI_API_KEY%"=="" (
+    echo ERROR: GEMINI_API_KEY environment variable is not set.
+    echo Please set your Google Gemini API key as an environment variable:
+    echo   set GEMINI_API_KEY=your_gemini_api_key_here
+    echo.
+    echo Or add it to your system environment variables.
+    pause
+    exit /b 1
+)
+
+echo ✓ API keys found in environment variables
+echo.
 
 REM Get the directory where this batch file is located
 cd /d "%~dp0"
@@ -29,6 +54,13 @@ if %errorlevel% == 0 (
 )
 
 echo Error: Python not found. Please install Python or add it to your PATH.
+echo.
+echo Required Python packages:
+echo - assemblyai
+echo - google-generativeai
+echo - pydub (optional)
+echo.
+echo Install with: pip install assemblyai google-generativeai pydub
 pause
 
 :end

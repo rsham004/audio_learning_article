@@ -1,8 +1,13 @@
 #!/bin/bash
 
-# Set the AssemblyAI API key as an environment variable
-# Replace YOUR_ASSEMBLYAI_API_KEY with your actual API key
+# Set API keys as environment variables
 export ASSEMBLYAI_API_KEY="579bb999c2234de0921a01ce336d71da"
+export GEMINI_API_KEY="AIzaSyAvueAi6yz3U8sKVi9stsdbC7a31Ce6uGI"
+
+echo "Audio Learning Article - Enhanced Video Transcriber"
+echo "==================================================="
+echo "Features: Video transcription + AI learning article generation"
+echo ""
 
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -22,5 +27,12 @@ elif command -v py &> /dev/null; then
     py process_videos.py
 else
     echo "Error: Python not found. Please install Python or add it to your PATH."
+    echo ""
+    echo "Required Python packages:"
+    echo "- assemblyai"
+    echo "- google-generativeai"
+    echo "- pydub (optional)"
+    echo ""
+    echo "Install with: pip install assemblyai google-generativeai pydub"
     exit 1
 fi

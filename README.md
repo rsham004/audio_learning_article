@@ -1,27 +1,31 @@
 # Audio Learning Article
 
-A Python-based video transcription tool that converts MP4 videos to markdown transcripts using AssemblyAI's speech-to-text API.
+An enhanced Python-based video transcription tool that converts MP4 videos to markdown transcripts and automatically generates comprehensive learning articles using AI.
 
 ## Features
 
-- **Automatic Video Processing**: Monitors input folder for new MP4 files
-- **Audio Extraction**: Converts MP4 videos to MP3 audio (with fallback for direct video transcription)
-- **AI Transcription**: Uses AssemblyAI for high-quality speech-to-text conversion
-- **Markdown Output**: Generates clean markdown files with transcripts
-- **File Management**: Automatically moves processed videos to archive folder
-- **Cross-Platform**: Works on Windows, macOS, and Linux
-- **Error Handling**: Graceful handling of missing dependencies and API errors
+- **🎥 Automatic Video Processing**: Monitors input folder for new MP4 files
+- **🎵 Audio Extraction**: Converts MP4 videos to MP3 audio (with fallback for direct video transcription)
+- **🤖 AI Transcription**: Uses AssemblyAI for high-quality speech-to-text conversion
+- **📚 Learning Article Generation**: Uses Google Gemini AI to create structured educational articles
+- **📝 Dual Output**: Generates both raw transcripts and enhanced learning articles
+- **🗑️ Smart File Management**: Automatically deletes processed videos after successful completion
+- **💰 Cost Tracking**: Monitors and logs API usage costs for both services
+- **🖥️ Cross-Platform**: Works on Windows, macOS, and Linux
+- **⚡ Automated Workflow**: Drop video → get transcript + learning article
+- **🛡️ Error Handling**: Graceful handling of missing dependencies and API errors
 
 ## Directory Structure
 
 ```
 audio_learning_article/
 ├── video_transcriber/
-│   ├── InputVideos/           # Place MP4 files here for processing
-│   │   └── Processed/         # Processed videos are moved here
-│   ├── OutputMarkdown/        # Generated markdown transcripts
+│   ├── InputVideos/           # Place MP4 files here (auto-deleted after processing)
+│   ├── OutputMarkdown/        # Raw transcripts from AssemblyAI
+│   ├── LearningArticles/      # Enhanced learning articles from Gemini AI
 │   ├── Scripts/               # Additional scripts (if any)
 │   ├── process_videos.py      # Main Python script
+│   ├── article_generator.py   # Gemini AI article generation module
 │   ├── run_transcriber.bat    # Windows batch file runner
 │   ├── run_transcriber.sh     # Bash script runner
 │   └── file_watcher.ps1       # PowerShell file watcher for automation
@@ -33,9 +37,10 @@ audio_learning_article/
 
 1. **Python 3.7+** installed on your system
 2. **AssemblyAI API Key** (sign up at [AssemblyAI](https://www.assemblyai.com/))
-3. **Required Python packages**:
+3. **Google Gemini API Key** (sign up at [Google AI Studio](https://makersuite.google.com/))
+4. **Required Python packages**:
    ```bash
-   pip install assemblyai pydub
+   pip install assemblyai google-generativeai pydub
    ```
 
 ## Setup
@@ -163,37 +168,60 @@ For more precise and reliable file monitoring, use the included PowerShell file 
 - Display progress and status messages
 - Continue monitoring until you press Ctrl+C
 
-### Processing Workflow
+### Enhanced Processing Workflow
 
-1. Place your MP4 video files in `video_transcriber/InputVideos/`
-2. **Manual**: Run the transcriber using one of the methods above
-3. **Automatic**: Files will be processed automatically if you've set up the scheduler
-4. The script will:
-   - Extract audio from each MP4 file
-   - Send audio to AssemblyAI for transcription
-   - Generate markdown files in `OutputMarkdown/`
-   - Move processed videos to `InputVideos/Processed/`
-   - Clean up temporary audio files
+1. **Drop MP4 files** in `video_transcriber/InputVideos/`
+2. **Choose execution method**:
+   - **Manual**: Run the transcriber using one of the methods above
+   - **Automatic**: Files will be processed automatically if you've set up the scheduler/file watcher
+3. **The enhanced script will**:
+   - ✅ Extract audio from each MP4 file
+   - ✅ Send audio to AssemblyAI for transcription
+   - ✅ Generate raw transcript in `OutputMarkdown/`
+   - ✅ Send transcript to Google Gemini AI for article generation
+   - ✅ Create structured learning article in `LearningArticles/`
+   - ✅ Delete original MP4 file (only after successful completion)
+   - ✅ Clean up temporary audio files
+   - ✅ Log processing costs and metadata
+
+**Output Files:**
+- `OutputMarkdown/[filename].md` - Raw transcript from AssemblyAI
+- `LearningArticles/[filename]_article.md` - Enhanced learning article from Gemini
+
+**Safety Features:**
+- Original video files are only deleted after BOTH transcription AND article generation succeed
+- If any step fails, the original video is preserved
+- Detailed error logging and cost tracking
 
 ## Configuration
 
 ### API Key Setup
 
-You can set your AssemblyAI API key in several ways:
+You need to configure both API keys:
 
-1. **Environment Variable** (recommended):
-   ```bash
-   export ASSEMBLYAI_API_KEY="your_api_key_here"
-   ```
+**Method 1: Edit Runner Scripts (Recommended)**
+- Modify `ASSEMBLYAI_API_KEY` and `GEMINI_API_KEY` in `run_transcriber.bat` or `run_transcriber.sh`
 
-2. **Edit Runner Scripts**:
-   - Modify the `ASSEMBLYAI_API_KEY` value in `run_transcriber.bat` or `run_transcriber.sh`
+**Method 2: Environment Variables**
+```bash
+export ASSEMBLYAI_API_KEY="your_assemblyai_key_here"
+export GEMINI_API_KEY="your_gemini_key_here"
+```
 
 ### Supported File Formats
 
 - **Input**: MP4 video files
-- **Output**: Markdown (.md) files
+- **Output**: 
+  - Raw transcripts: Markdown (.md) files
+  - Learning articles: Enhanced markdown (.md) files with structured content
 - **Temporary**: MP3 audio files (automatically cleaned up)
+
+### Cost Management
+
+The system tracks costs for both APIs:
+- **AssemblyAI**: ~$0.37 per hour of audio
+- **Google Gemini 1.5 Flash**: ~$0.075 per 1M input tokens, $0.30 per 1M output tokens
+- Cost estimates are logged with each processing session
 
 ## Troubleshooting
 
