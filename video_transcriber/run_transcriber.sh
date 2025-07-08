@@ -1,12 +1,30 @@
 #!/bin/bash
 
-# Set API keys as environment variables
-export ASSEMBLYAI_API_KEY="579bb999c2234de0921a01ce336d71da"
-export GEMINI_API_KEY="AIzaSyAvueAi6yz3U8sKVi9stsdbC7a31Ce6uGI"
-
 echo "Audio Learning Article - Enhanced Video Transcriber"
 echo "==================================================="
 echo "Features: Video transcription + AI learning article generation"
+echo ""
+
+# Check if API keys are set as environment variables
+if [ -z "$ASSEMBLYAI_API_KEY" ]; then
+    echo "ERROR: ASSEMBLYAI_API_KEY environment variable is not set."
+    echo "Please set your AssemblyAI API key as an environment variable:"
+    echo "  export ASSEMBLYAI_API_KEY=\"your_assemblyai_api_key_here\""
+    echo ""
+    echo "Or add it to your ~/.bashrc or ~/.zshrc file."
+    exit 1
+fi
+
+if [ -z "$GEMINI_API_KEY" ]; then
+    echo "ERROR: GEMINI_API_KEY environment variable is not set."
+    echo "Please set your Google Gemini API key as an environment variable:"
+    echo "  export GEMINI_API_KEY=\"your_gemini_api_key_here\""
+    echo ""
+    echo "Or add it to your ~/.bashrc or ~/.zshrc file."
+    exit 1
+fi
+
+echo "✓ API keys found in environment variables"
 echo ""
 
 # Get the directory where this script is located

@@ -61,8 +61,12 @@ def test_article_generation():
         return False
 
 if __name__ == "__main__":
-    # Set environment variables for testing
-    os.environ["GEMINI_API_KEY"] = "AIzaSyAvueAi6yz3U8sKVi9stsdbC7a31Ce6uGI"
+    # Check if API key is set
+    if not os.environ.get("GEMINI_API_KEY"):
+        print("❌ GEMINI_API_KEY environment variable not set.")
+        print("Please set your Google Gemini API key:")
+        print("  export GEMINI_API_KEY=\"your_gemini_api_key_here\"")
+        exit(1)
     
     success = test_article_generation()
     if success:
