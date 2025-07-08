@@ -197,16 +197,38 @@ For more precise and reliable file monitoring, use the included PowerShell file 
 
 ### API Key Setup
 
-You need to configure both API keys:
+You need to configure both API keys as environment variables for security:
 
-**Method 1: Edit Runner Scripts (Recommended)**
-- Modify `ASSEMBLYAI_API_KEY` and `GEMINI_API_KEY` in `run_transcriber.bat` or `run_transcriber.sh`
-
-**Method 2: Environment Variables**
+**Method 1: Environment Variables (Recommended)**
 ```bash
+# Linux/macOS
 export ASSEMBLYAI_API_KEY="your_assemblyai_key_here"
 export GEMINI_API_KEY="your_gemini_key_here"
+
+# Windows Command Prompt
+set ASSEMBLYAI_API_KEY=your_assemblyai_key_here
+set GEMINI_API_KEY=your_gemini_key_here
+
+# Windows PowerShell
+$env:ASSEMBLYAI_API_KEY="your_assemblyai_key_here"
+$env:GEMINI_API_KEY="your_gemini_key_here"
 ```
+
+**Method 2: Add to Shell Profile (Persistent)**
+```bash
+# Add to ~/.bashrc, ~/.zshrc, or ~/.profile
+echo 'export ASSEMBLYAI_API_KEY="your_assemblyai_key_here"' >> ~/.bashrc
+echo 'export GEMINI_API_KEY="your_gemini_key_here"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+**Method 3: Windows System Environment Variables**
+1. Open System Properties → Advanced → Environment Variables
+2. Add new user variables:
+   - `ASSEMBLYAI_API_KEY` = your_assemblyai_key_here
+   - `GEMINI_API_KEY` = your_gemini_key_here
+
+**⚠️ Security Note:** Never commit API keys to version control. The runner scripts now check for environment variables and will not expose your keys.
 
 ### Supported File Formats
 
