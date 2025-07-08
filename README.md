@@ -23,7 +23,8 @@ audio_learning_article/
 │   ├── Scripts/               # Additional scripts (if any)
 │   ├── process_videos.py      # Main Python script
 │   ├── run_transcriber.bat    # Windows batch file runner
-│   └── run_transcriber.sh     # Bash script runner
+│   ├── run_transcriber.sh     # Bash script runner
+│   └── file_watcher.ps1       # PowerShell file watcher for automation
 ├── .gitignore
 └── README.md
 ```
@@ -57,7 +58,7 @@ audio_learning_article/
 
 ## Usage
 
-### Method 1: Using the Runner Scripts
+### Method 1: Manual Execution
 
 **Windows:**
 ```cmd
@@ -71,18 +72,103 @@ cd video_transcriber
 bash run_transcriber.sh
 ```
 
-### Method 2: Direct Python Execution
-
+**Direct Python:**
 ```bash
 cd video_transcriber
 python process_videos.py
 ```
 
+### Method 2: Automated Processing with Windows Task Scheduler
+
+For automatic processing when files are added to the input folder, you can set up a Windows Task Scheduler task:
+
+#### Step-by-Step Setup:
+
+1. **Open Task Scheduler**:
+   - Press `Win + R`, type `taskschd.msc`, and press Enter
+   - Or search for "Task Scheduler" in the Start menu
+
+2. **Create a New Task**:
+   - In the right panel, click "Create Task..."
+   - Name: `Audio Learning Article Transcriber`
+   - Description: `Automatically transcribe videos when added to input folder`
+   - Check "Run whether user is logged on or not"
+   - Check "Run with highest privileges"
+
+3. **Configure Triggers**:
+   - Go to the "Triggers" tab
+   - Click "New..."
+   - Begin the task: "On an event"
+   - Settings:
+     - Log: `System`
+     - Source: `Microsoft-Windows-Kernel-File`
+     - Event ID: `11` (file creation)
+   - Click "OK"
+
+4. **Configure Actions**:
+   - Go to the "Actions" tab
+   - Click "New..."
+   - Action: "Start a program"
+   - Program/script: `cmd.exe`
+   - Add arguments: `/c "cd /d "D:\vscode_projects\challenges\audio_learning_article\video_transcriber" && run_transcriber.bat"`
+   - **Note**: Replace the path with your actual project path
+   - Click "OK"
+
+5. **Configure Conditions** (Optional):
+   - Go to the "Conditions" tab
+   - Uncheck "Start the task only if the computer is on AC power" (for laptops)
+   - Check "Wake the computer to run this task" if desired
+
+6. **Configure Settings**:
+   - Go to the "Settings" tab
+   - Check "Allow task to be run on demand"
+   - Check "Run task as soon as possible after a scheduled start is missed"
+   - If task fails, restart every: `1 minute`
+   - Attempt to restart up to: `3 times`
+
+7. **Save the Task**:
+   - Click "OK"
+   - Enter your Windows password when prompted
+
+#### Alternative: PowerShell File Watcher (Recommended)
+
+For more precise and reliable file monitoring, use the included PowerShell file watcher script:
+
+**To use the PowerShell file watcher:**
+1. Open PowerShell as Administrator
+2. Set execution policy (one-time setup):
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+3. Navigate to the video_transcriber folder:
+   ```powershell
+   cd "D:\vscode_projects\challenges\audio_learning_article\video_transcriber"
+   ```
+4. Run the file watcher:
+   ```powershell
+   .\file_watcher.ps1
+   ```
+
+**Features of the PowerShell file watcher:**
+- **Smart file detection**: Waits for files to be fully copied before processing
+- **File lock checking**: Ensures files aren't still being written to
+- **Colored output**: Easy-to-read status messages
+- **Error handling**: Graceful handling of transcription errors
+- **Automatic path detection**: No need to edit paths in the script
+
+**The file watcher will:**
+- Monitor the InputVideos folder for new MP4 files
+- Wait for files to be completely copied
+- Automatically start transcription when ready
+- Display progress and status messages
+- Continue monitoring until you press Ctrl+C
+
 ### Processing Workflow
 
 1. Place your MP4 video files in `video_transcriber/InputVideos/`
-2. Run the transcriber using one of the methods above
-3. The script will:
+2. **Manual**: Run the transcriber using one of the methods above
+3. **Automatic**: Files will be processed automatically if you've set up the scheduler
+4. The script will:
    - Extract audio from each MP4 file
    - Send audio to AssemblyAI for transcription
    - Generate markdown files in `OutputMarkdown/`
