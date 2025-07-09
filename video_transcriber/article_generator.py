@@ -3,6 +3,9 @@ import time
 import logging
 from typing import Optional, Tuple
 import google.generativeai as genai
+from dotenv import load_dotenv  # Add dotenv import
+
+load_dotenv('.env')  # Specify .env file location
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -20,7 +23,7 @@ class ArticleGenerator:
         Args:
             api_key: Google Gemini API key. If None, will try to get from environment
         """
-        self.api_key = api_key or os.environ.get("GEMINI_API_KEY")
+        self.api_key = api_key or os.getenv("GEMINI_API_KEY")  # Use getenv for consistency
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY not provided and not found in environment variables")
         
@@ -50,11 +53,13 @@ You are an expert educational content creator. Transform the following transcrip
 
 **Instructions:**
 1. Create a professional learning article with clear sections
-2. Elaborate on all concepts mentioned in the transcript
-3. Add context and explanations where needed
-4. Structure the content logically for learning
-5. Use markdown formatting with proper headings
-6. Make it engaging and educational
+2. Elaborate on **all sections** in detail
+3. Expand all concepts mentioned in the transcript with thorough explanations
+4. Add context, examples, and applications for every topic
+5. Structure the content logically for learning progression
+6. Use markdown formatting with proper headings and subheadings
+7. Ensure clarity and readability for educational purposes
+8. Make the content engaging and practical
 
 **Required Article Structure:**
 # [Descriptive Title Based on Content]

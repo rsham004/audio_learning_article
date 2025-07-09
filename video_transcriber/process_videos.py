@@ -1,6 +1,9 @@
 import os
 import assemblyai as aai
 from article_generator import ArticleGenerator
+from dotenv import load_dotenv  # Add dotenv import
+
+load_dotenv()  # Load environment variables
 
 # Try to import pydub, with fallback for Python 3.13 compatibility
 try:
