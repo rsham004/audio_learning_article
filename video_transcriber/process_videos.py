@@ -12,6 +12,7 @@ try:
 except ImportError as e:
     print(f"Warning: pydub import failed: {e}")
     print("Audio conversion will be skipped. Please ensure your input files are already in MP3 format.")
+    AudioSegment = None
     PYDUB_AVAILABLE = False
 
 # --- Configuration ---
@@ -40,10 +41,15 @@ def process_video(video_path):
         # 1. Convert MP4 to MP3 using pydub (if available)
         print("Step 1: Audio extraction...")
         if PYDUB_AVAILABLE:
-            audio = AudioSegment.from_file(video_path, format="mp4")
-            audio.export(mp3_path, format="mp3")
-            print(f"✓ Extracted audio to: {mp3_path}")
-            audio_file_path = mp3_path
+            try:
+                audio = AudioSegment.from_file(video_path, format="mp4")
+                audio.export(mp3_path, format="mp3")
+                print(f"✓ Extracted audio to: {mp3_path}")
+                audio_file_path = mp3_path
+            except (OSError, IOError) as e:
+                print(f"Error converting video to MP3: {e}")
+                print("Ensure ffmpeg is installed and in your PATH. Falling back to original video.")
+                audio_file_path = video_path
         else:
             print("⚠ pydub not available, attempting to transcribe video file directly...")
             audio_file_path = video_path
@@ -57,6 +63,7 @@ def process_video(video_path):
 
         transcriber = aai.Transcriber()
         transcript = transcriber.transcribe(audio_file_path)
+        transcript_text = ""
         
         if transcript.status == aai.TranscriptStatus.completed:
             transcript_text = transcript.text
