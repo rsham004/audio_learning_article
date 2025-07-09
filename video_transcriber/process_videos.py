@@ -9,10 +9,14 @@ load_dotenv()  # Load environment variables
 try:
     from pydub import AudioSegment
     PYDUB_AVAILABLE = True
+    print("✓ pydub is available for audio conversion")
 except ImportError as e:
     print(f"Warning: pydub import failed: {e}")
-    print("Audio conversion will be skipped. Please ensure your input files are already in MP3 format.")
-    AudioSegment = None
+    if "pyaudioop" in str(e) or "audioop" in str(e):
+        print("This is a known issue with Python 3.13 where audioop module was removed.")
+        print("MP4 to MP3 conversion will be skipped. Please use MP3 files directly or convert them manually.")
+    else:
+        print("Audio conversion will be skipped. Please ensure your input files are already in MP3 format.")
     PYDUB_AVAILABLE = False
 
 # --- Configuration ---
@@ -29,6 +33,7 @@ os.makedirs(LEARNING_ARTICLES_FOLDER, exist_ok=True)
 def process_video(video_path):
     video_filename = os.path.basename(video_path)
     base_name = os.path.splitext(video_filename)[0]
+    file_extension = os.path.splitext(video_filename)[1].lower()
     
     mp3_path = os.path.join(OUTPUT_FOLDER, f"{base_name}.mp3")
     markdown_path = os.path.join(OUTPUT_FOLDER, f"{base_name}.md")
@@ -38,11 +43,17 @@ def process_video(video_path):
     print("=" * 50)
 
     try:
-        # 1. Convert MP4 to MP3 using pydub (if available)
-        print("Step 1: Audio extraction...")
-        if PYDUB_AVAILABLE:
+        # 1. Handle audio extraction based on file type
+        print("Step 1: Audio preparation...")
+        
+        # If it's already an MP3 file, use it directly
+        if file_extension == ".mp3":
+            print("✓ Input is already MP3 format, using directly.")
+            audio_file_path = video_path
+        elif PYDUB_AVAILABLE and file_extension == ".mp4":
+            # Convert MP4 to MP3 using pydub
             try:
-                audio = AudioSegment.from_file(video_path, format="mp4")
+                audio = AudioSegment.from_file(video_path)
                 audio.export(mp3_path, format="mp3")
                 print(f"✓ Extracted audio to: {mp3_path}")
                 audio_file_path = mp3_path
@@ -50,8 +61,12 @@ def process_video(video_path):
                 print(f"Error converting video to MP3: {e}")
                 print("Ensure ffmpeg is installed and in your PATH. Falling back to original video.")
                 audio_file_path = video_path
+            except Exception as e:
+                print(f"Unexpected error during audio conversion: {e}")
+                print("Falling back to original video file.")
+                audio_file_path = video_path
         else:
-            print("⚠ pydub not available, attempting to transcribe video file directly...")
+            print("⚠ pydub not available or unsupported format, attempting to transcribe file directly...")
             audio_file_path = video_path
 
         # 2. Transcribe using AssemblyAI
@@ -63,10 +78,12 @@ def process_video(video_path):
 
         transcriber = aai.Transcriber()
         transcript = transcriber.transcribe(audio_file_path)
-        transcript_text = ""
         
         if transcript.status == aai.TranscriptStatus.completed:
-            transcript_text = transcript.text
+            transcript_text = transcript.text or ""
+            if not transcript_text:
+                print("❌ Transcription completed but no text was returned.")
+                return False
             print("✓ Transcribed using AssemblyAI.")
         else:
             print(f"❌ AssemblyAI transcription failed: {transcript.error}")
@@ -97,8 +114,8 @@ def process_video(video_path):
             print("⚠ Transcript saved, but article generation failed. Keeping original video file.")
             return False
 
-        # 5. Clean up temporary MP3 (only if we created one)
-        if PYDUB_AVAILABLE and os.path.exists(mp3_path):
+        # 5. Clean up temporary MP3 (only if we created one and it's not the original file)
+        if PYDUB_AVAILABLE and file_extension == ".mp4" and os.path.exists(mp3_path):
             os.remove(mp3_path)
             print(f"✓ Removed temporary MP3: {mp3_path}")
 
@@ -123,14 +140,14 @@ def process_video(video_path):
         return False
 
 def main():
-    print("Checking for new video files...")
+    print("Checking for new video and audio files...")
     for filename in os.listdir(INPUT_FOLDER):
-        if filename.lower().endswith(".mp4"):
-            video_path = os.path.join(INPUT_FOLDER, filename)
+        if filename.lower().endswith((".mp4", ".mp3")):
+            file_path = os.path.join(INPUT_FOLDER, filename)
             # Ensure it's a file, not a directory
-            if os.path.isfile(video_path):
-                process_video(video_path)
-    print("Finished checking for video files.")
+            if os.path.isfile(file_path):
+                process_video(file_path)
+    print("Finished checking for video and audio files.")
 
 if __name__ == "__main__":
     main()
