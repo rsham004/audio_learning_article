@@ -39,19 +39,15 @@ venv.bak/
 Thumbs.db
 
 # Project specific
-video_transcriber/InputVideos/*.mp4
-video_transcriber/InputVideos/*.mov
-video_transcriber/InputVideos/*.avi
-video_transcriber/OutputMarkdown/*.md
-video_transcriber/OutputMarkdown/*.mp3
-video_transcriber/LearningArticles/*.md
+/video_transcriber/InputVideos/*
+/video_transcriber/OutputMarkdown/*
+/video_transcriber/LearningArticles/*
 
-# Keep directory structure but ignore content
+# Keep directory structure but ignore all content except .gitkeep
 !video_transcriber/InputVideos/.gitkeep
 !video_transcriber/OutputMarkdown/.gitkeep
 !video_transcriber/LearningArticles/.gitkeep
 
-# Environment variables
 .env
 
 # Test scripts (may contain temporary API keys during development)
