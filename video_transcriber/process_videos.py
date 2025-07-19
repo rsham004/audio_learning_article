@@ -30,16 +30,23 @@ LEARNING_ARTICLES_FOLDER = os.path.join(SCRIPT_DIR, "LearningArticles")
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 os.makedirs(LEARNING_ARTICLES_FOLDER, exist_ok=True)
 
-def process_video(video_path):
+def process_video(video_path, relative_path):
     video_filename = os.path.basename(video_path)
     base_name = os.path.splitext(video_filename)[0]
     file_extension = os.path.splitext(video_filename)[1].lower()
-    
-    mp3_path = os.path.join(OUTPUT_FOLDER, f"{base_name}.mp3")
-    markdown_path = os.path.join(OUTPUT_FOLDER, f"{base_name}.md")
-    article_path = os.path.join(LEARNING_ARTICLES_FOLDER, f"{base_name}_article.md")
 
-    print(f"Processing: {video_filename}")
+    # Create the same folder structure in output directories
+    output_dir_markdown = os.path.join(OUTPUT_FOLDER, relative_path)
+    output_dir_articles = os.path.join(LEARNING_ARTICLES_FOLDER, relative_path)
+    
+    os.makedirs(output_dir_markdown, exist_ok=True)
+    os.makedirs(output_dir_articles, exist_ok=True)
+
+    mp3_path = os.path.join(output_dir_markdown, f"{base_name}.mp3")
+    markdown_path = os.path.join(output_dir_markdown, f"{base_name}.md")
+    article_path = os.path.join(output_dir_articles, f"{base_name}_article.md")
+
+    print(f"Processing: {os.path.join(relative_path, video_filename)}")
     print("=" * 50)
 
     try:
@@ -141,12 +148,14 @@ def process_video(video_path):
 
 def main():
     print("Checking for new video and audio files...")
-    for filename in os.listdir(INPUT_FOLDER):
-        if filename.lower().endswith((".mp4", ".mp3")):
-            file_path = os.path.join(INPUT_FOLDER, filename)
-            # Ensure it's a file, not a directory
-            if os.path.isfile(file_path):
-                process_video(file_path)
+    for root, _, files in os.walk(INPUT_FOLDER):
+        for filename in files:
+            if filename.lower().endswith((".mp4", ".mp3")):
+                file_path = os.path.join(root, filename)
+                relative_path = os.path.relpath(root, INPUT_FOLDER)
+                if relative_path == ".":
+                    relative_path = ""
+                process_video(file_path, relative_path)
     print("Finished checking for video and audio files.")
 
 if __name__ == "__main__":
